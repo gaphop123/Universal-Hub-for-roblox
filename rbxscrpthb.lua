@@ -134,6 +134,85 @@ local Slider = VLTab:CreateSlider({
 })
 
 
+local crosshairGui
+local crosshairParts = {}
+
+VLTab:CreateToggle({
+    Name = "Crosshair",
+    CurrentValue = false,
+    Flag = "CrosshairToggle",
+    Callback = function(Value)
+        if Value then
+            if crosshairGui then
+                crosshairGui.Enabled = true
+                return
+            end
+
+            local player = game.Players.LocalPlayer
+            local playerGui = player:WaitForChild("PlayerGui")
+
+            crosshairGui = Instance.new("ScreenGui")
+            crosshairGui.Name = "UniversalHubCrosshair"
+            crosshairGui.IgnoreGuiInset = true
+            crosshairGui.ResetOnSpawn = false
+            crosshairGui.Parent = playerGui
+
+            local function CreateLine(size, pos)
+                local frame = Instance.new("Frame")
+                frame.AnchorPoint = Vector2.new(0.5, 0.5)
+                frame.Position = pos
+                frame.Size = size
+                frame.BorderSizePixel = 0
+                frame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+                frame.Parent = crosshairGui
+
+                table.insert(crosshairParts, frame)
+            end
+
+            -- Top
+            CreateLine(
+                UDim2.fromOffset(2, 12),
+                UDim2.new(0.5, 0, 0.5, -10)
+            )
+
+            -- Bottom
+            CreateLine(
+                UDim2.fromOffset(2, 12),
+                UDim2.new(0.5, 0, 0.5, 10)
+            )
+
+            -- Left
+            CreateLine(
+                UDim2.fromOffset(12, 2),
+                UDim2.new(0.5, -10, 0.5, 0)
+            )
+
+            -- Right
+            CreateLine(
+                UDim2.fromOffset(12, 2),
+                UDim2.new(0.5, 10, 0.5, 0)
+            )
+
+        else
+            if crosshairGui then
+                crosshairGui.Enabled = false
+            end
+        end
+    end,
+})
+
+VLTab:CreateColorPicker({
+    Name = "Crosshair Color",
+    Color = Color3.fromRGB(255, 255, 255),
+    Flag = "CrosshairColor",
+    Callback = function(Value)
+        for _, part in ipairs(crosshairParts) do
+            if part then
+                part.BackgroundColor3 = Value
+            end
+        end
+    end,
+})
 
 local PLTab = Window:CreateTab("Player", "user")
 local Section = PLTab:CreateSection("Player") -- everyone can see it
@@ -193,6 +272,133 @@ local Toggle = PLTab:CreateToggle({
       end
    end,
 })
+
+local Toggle = PLTab:CreateToggle({
+   Name = "Enable Jump Power",
+   CurrentValue = false,
+   Flag = "JumpPowerToggle",
+   Callback = function(Value)
+      jumpEnabled = Value
+
+      if Value then
+         jumpConnection = RunService.RenderStepped:Connect(function()
+            local character = Players.LocalPlayer.Character
+            if character then
+               local humanoid = character:FindFirstChild("Humanoid")
+               if humanoid then
+                  humanoid.UseJumpPower = true
+                  humanoid.JumpPower = jumpPower
+               end
+            end
+         end)
+      else
+         if jumpConnection then
+            jumpConnection:Disconnect()
+            jumpConnection = nil
+         end
+
+         local character = Players.LocalPlayer.Character
+         if character then
+            local humanoid = character:FindFirstChild("Humanoid")
+            if humanoid then
+               humanoid.JumpPower = 50 -- Giá trị mặc định
+            end
+         end
+      end
+   end,
+})
+
+local Input = PLTab:CreateInput({
+   Name = "Jump Power",
+   CurrentValue = "50",
+   PlaceholderText = "Enter Jump Power",
+   RemoveTextAfterFocusLost = false,
+   Flag = "JumpPowerInput",
+   Callback = function(Text)
+      local value = tonumber(Text)
+
+      if value then
+         jumpPower = value
+
+         if jumpEnabled then
+            local character = Players.LocalPlayer.Character
+            if character then
+               local humanoid = character:FindFirstChild("Humanoid")
+               if humanoid then
+                  humanoid.UseJumpPower = true
+                  humanoid.JumpPower = jumpPower
+               end
+            end
+         end
+      end
+   end,
+})
+
+local Section = PLTab:CreateSection("Animations")
+
+local Input = PLTab:CreateInput({
+    Name = "Animation ID",
+    CurrentValue = "",
+    PlaceholderText = "Ex: 507766388",
+    RemoveTextAfterFocusLost = false,
+    Flag = "AnimationID",
+    Callback = function(Text)
+        animationId = Text
+    end,
+})
+
+local Button = PLTab:CreateButton({
+    Name = "Play Animation",
+    Callback = function()
+        local player = game.Players.LocalPlayer
+        local character = player.Character or player.CharacterAdded:Wait()
+        local humanoid = character:FindFirstChildOfClass("Humanoid")
+
+        if humanoid and animationId ~= "" then
+            local animator = humanoid:FindFirstChildOfClass("Animator")
+            if not animator then
+                animator = Instance.new("Animator")
+                animator.Parent = humanoid
+            end
+
+            local animation = Instance.new("Animation")
+            animation.AnimationId = "rbxassetid://" .. animationId
+
+            local track = animator:LoadAnimation(animation)
+            track:Play()
+        end
+    end,
+})
+
+
+local MCTab = Window:CreateTab("Misc", "ellipsis")
+local Section = MCTab:CreateSection(" ")
+
+local TeleportService = game:GetService("TeleportService")
+local Players = game:GetService("Players")
+
+local Button = MCTab:CreateButton({
+    Name = "Rejoin",
+    Callback = function()
+        TeleportService:Teleport(game.PlaceId, Players.LocalPlayer)
+    end,
+})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 Rayfield:Notify({
