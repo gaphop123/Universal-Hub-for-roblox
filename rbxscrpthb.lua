@@ -3,11 +3,11 @@ local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local Window = Rayfield:CreateWindow({
    Name = "Universal Hub",
-   Icon = 0, -- Icon in Topbar. Can use Lucide Icons (string) or Roblox Image (number). 0 to use no icon (default).
+   Icon = "scroll-text", -- Icon in Topbar. Can use Lucide Icons (string) or Roblox Image (number). 0 to use no icon (default).
    LoadingTitle = "Please wait, loading Hub...",
    LoadingSubtitle = "by Gaphop",
    ShowText = "Rayfield", -- for mobile users to unhide Rayfield, change if you'd like
-   Theme = "Green", -- Check https://docs.sirius.menu/rayfield/configuration/themes
+   Theme = "Bloom", -- Check https://docs.sirius.menu/rayfield/configuration/themes
 
    ToggleUIKeybind = "K", -- The keybind to toggle the UI visibility (string like "K" or Enum.KeyCode)
 
@@ -220,7 +220,7 @@ local Section = PLTab:CreateSection("Player") -- everyone can see it
 local Toggle = PLTab:CreateToggle({
    Name = "Enable Speed",
    CurrentValue = false,
-   Flag = "Toggle4", -- A flag is the identifier for the configuration file; make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+   Flag = "SpeedToggle",
    Callback = function(Value)
       getgenv().speed.enabled = Value
    end,
@@ -231,9 +231,12 @@ local Input = PLTab:CreateInput({
    CurrentValue = "18",
    PlaceholderText = "Speed",
    RemoveTextAfterFocusLost = false,
-   Flag = "Input1",
+   Flag = "SpeedInput",
    Callback = function(Text)
-      getgenv().speed.speed = Text
+      local value = tonumber(Text)
+      if value then
+         getgenv().speed.speed = value
+      end
    end,
 })
 
@@ -242,7 +245,7 @@ local noclipConnection
 local Toggle = PLTab:CreateToggle({
    Name = "Enable Noclip",
    CurrentValue = false,
-   Flag = "Toggle5",
+   Flag = "NoclipToggle",
    Callback = function(Value)
       if Value then
          noclipConnection = game:GetService("RunService").Stepped:Connect(function()
@@ -272,6 +275,13 @@ local Toggle = PLTab:CreateToggle({
       end
    end,
 })
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+
+local jumpEnabled = false
+local jumpPower = 50
+local jumpConnection = nil
 
 local Toggle = PLTab:CreateToggle({
    Name = "Enable Jump Power",
@@ -336,6 +346,8 @@ local Input = PLTab:CreateInput({
 
 local Section = PLTab:CreateSection("Animations")
 
+local animationId = ""
+
 local Input = PLTab:CreateInput({
     Name = "Animation ID",
     CurrentValue = "",
@@ -354,21 +366,97 @@ local Button = PLTab:CreateButton({
         local character = player.Character or player.CharacterAdded:Wait()
         local humanoid = character:FindFirstChildOfClass("Humanoid")
 
-        if humanoid and animationId ~= "" then
-            local animator = humanoid:FindFirstChildOfClass("Animator")
-            if not animator then
-                animator = Instance.new("Animator")
-                animator.Parent = humanoid
-            end
+        if not humanoid or animationId == "" then
+            return
+        end
 
-            local animation = Instance.new("Animation")
-            animation.AnimationId = "rbxassetid://" .. animationId
+        local animator = humanoid:FindFirstChildOfClass("Animator")
+        if not animator then
+            animator = Instance.new("Animator")
+            animator.Parent = humanoid
+        end
 
-            local track = animator:LoadAnimation(animation)
+        local animation = Instance.new("Animation")
+        animation.AnimationId = "rbxassetid://" .. animationId
+
+        local success, track = pcall(function()
+            return animator:LoadAnimation(animation)
+        end)
+
+        if success and track then
             track:Play()
+        else
+            warn("invalid animation.")
         end
     end,
 })
+
+local RunService = game:GetService("RunService")
+
+local spinConnection
+local spinSpeed = 200000000 -- độ/giây (có thể tăng lên 5000, 10000...)
+
+PLTab:CreateToggle({
+    Name = "Spin",
+    CurrentValue = false,
+    Flag = "FlashSpin",
+    Callback = function(Value)
+        if Value then
+            if spinConnection then
+                spinConnection:Disconnect()
+            end
+
+            spinConnection = RunService.RenderStepped:Connect(function(dt)
+                local character = game.Players.LocalPlayer.Character
+                if not character then return end
+
+                local hrp = character:FindFirstChild("HumanoidRootPart")
+                if hrp then
+                    hrp.CFrame *= CFrame.Angles(0, math.rad(spinSpeed * dt), 0)
+                end
+            end)
+        else
+            if spinConnection then
+                spinConnection:Disconnect()
+                spinConnection = nil
+            end
+        end
+    end,
+})
+
+local RunService = game:GetService("RunService")
+
+local spinConnection
+
+PLTab:CreateToggle({
+    Name = "360 Spin",
+    CurrentValue = false,
+    Flag = "Spin360",
+    Callback = function(Value)
+        if Value then
+            spinConnection = RunService.RenderStepped:Connect(function(dt)
+                local character = game.Players.LocalPlayer.Character
+                if not character then return end
+
+                local hrp = character:FindFirstChild("HumanoidRootPart")
+                if not hrp then return end
+
+                hrp.CFrame *= CFrame.Angles(
+                    math.rad(720 * dt), -- X (lộn vòng)
+                    math.rad(720 * dt), -- Y (quay ngang)
+                    0                   -- Z
+                )
+            end)
+        else
+            if spinConnection then
+                spinConnection:Disconnect()
+                spinConnection = nil
+            end
+        end
+    end,
+})
+
+
 
 
 local MCTab = Window:CreateTab("Misc", "ellipsis")
@@ -383,21 +471,6 @@ local Button = MCTab:CreateButton({
         TeleportService:Teleport(game.PlaceId, Players.LocalPlayer)
     end,
 })
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
