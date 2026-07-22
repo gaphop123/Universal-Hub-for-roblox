@@ -472,7 +472,98 @@ local Button = MCTab:CreateButton({
     end,
 })
 
+local STTab = Window:CreateTab("Settings", "settings")
 
+local guiDestroyed = false
+
+local Button = STTab:CreateButton({
+   Name = "Destroy Rayfield GUI",
+   Callback = function()
+      Rayfield:Destroy()
+   end,
+})
+
+
+local devUnlocked = false
+
+STTab:CreateButton({
+    Name = "Developer Mode",
+    Callback = function()
+
+        if devUnlocked then
+            return
+        end
+
+        local PlayerGui = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
+        if PlayerGui:FindFirstChild("DevPasswordGui") then
+            return
+        end
+
+        local Gui = Instance.new("ScreenGui")
+        Gui.Name = "DevPasswordGui"
+        Gui.ResetOnSpawn = false
+        Gui.Parent = PlayerGui
+
+        local Frame = Instance.new("Frame")
+        Frame.Size = UDim2.fromOffset(300,140)
+        Frame.Position = UDim2.fromScale(.5,.5)
+        Frame.AnchorPoint = Vector2.new(.5,.5)
+        Frame.BackgroundColor3 = Color3.fromRGB(35,35,35)
+        Frame.Parent = Gui
+
+        local Title = Instance.new("TextLabel")
+        Title.Size = UDim2.new(1,0,0,30)
+        Title.BackgroundTransparency = 1
+        Title.Text = "Enter Password"
+        Title.TextColor3 = Color3.new(1,1,1)
+        Title.Parent = Frame
+
+        local Box = Instance.new("TextBox")
+        Box.Size = UDim2.new(1,-20,0,35)
+        Box.Position = UDim2.new(0,10,0,45)
+        Box.PlaceholderText = "Password"
+        Box.Text = ""
+        Box.ClearTextOnFocus = false
+        Box.TextColor3 = Color3.new(1,1,1)
+        Box.BackgroundColor3 = Color3.fromRGB(50,50,50)
+        Box.Parent = Frame
+
+        local Confirm = Instance.new("TextButton")
+        Confirm.Size = UDim2.new(1,-20,0,35)
+        Confirm.Position = UDim2.new(0,10,0,90)
+        Confirm.Text = "Confirm"
+        Confirm.Parent = Frame
+
+        Confirm.MouseButton1Click:Connect(function()
+
+            if Box.Text == "123456" then
+
+                devUnlocked = true
+
+                Gui:Destroy()
+                           Rayfield:Notify({
+                            Title = "Success",
+                            Content = "Developer Mode Enabled!",
+                            Duration = 3,
+                            Image = "code",
+                        })
+                local DevTab = Window:CreateTab("Dev","code")
+                DevTab:CreateSection("Developer")
+                DevTab:CreateSection("LOL, THIS TAB IS A TROLL, IS NOT FOR DEV")
+
+            else
+
+                Gui:Destroy()
+
+                Rayfield:Destroy()
+
+            end
+
+        end)
+
+    end,
+})
 
 Rayfield:Notify({
    Title = "Hub Loaded!",
