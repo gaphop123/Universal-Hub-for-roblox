@@ -65,6 +65,13 @@ local Button = ULTab:CreateButton({
     end,
 })
 
+local Button = ULTab:CreateButton({
+    Name = "Wall Hop Script",
+    Callback = function()
+      loadstring(game:HttpGet("https://raw.githubusercontent.com/ScpGuest666/Random-Roblox-script/refs/heads/main/Roblox%20WallHop%20V4%20script"))()
+    end,
+})
+
 
 local VLTab = Window:CreateTab("Visual", "eye")
 
