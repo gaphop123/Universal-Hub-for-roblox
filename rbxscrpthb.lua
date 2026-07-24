@@ -394,47 +394,99 @@ PLTab:CreateToggle({
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
-local UIS = game:GetService("UserInputService")
 
 local Player = Players.LocalPlayer
+
+local flyEnabled = false
+local flySpeed = 60
 
 local FlyConnection
 local BodyVelocity
 local BodyGyro
 
-local Toggle = PLTab:CreateToggle({
-    Name = "Fly",
+PLTab:CreateInput({
+    Name = "Fly Speed",
+    CurrentValue = "60",
+    PlaceholderText = "Speed",
+    RemoveTextAfterFocusLost = false,
+    Flag = "FlySpeed",
+    Callback = function(Text)
+        local Speed = tonumber(Text)
+        if Speed then
+            flySpeed = Speed
+        end
+    end,
+})
+
+PLTab:CreateToggle({
+    Name = "Enable Fly",
     CurrentValue = false,
     Flag = "FlyToggle",
 
     Callback = function(Value)
+
+        flyEnabled = Value
+
         local Character = Player.Character or Player.CharacterAdded:Wait()
+        local Humanoid = Character:WaitForChild("Humanoid")
         local Root = Character:WaitForChild("HumanoidRootPart")
 
         if Value then
+
+            if FlyConnection then
+                FlyConnection:Disconnect()
+            end
+
+            if BodyVelocity then
+                BodyVelocity:Destroy()
+            end
+
+            if BodyGyro then
+                BodyGyro:Destroy()
+            end
+
             BodyVelocity = Instance.new("BodyVelocity")
             BodyVelocity.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+            BodyVelocity.Velocity = Vector3.zero
             BodyVelocity.Parent = Root
 
             BodyGyro = Instance.new("BodyGyro")
             BodyGyro.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
             BodyGyro.P = 10000
+            BodyGyro.CFrame = workspace.CurrentCamera.CFrame
             BodyGyro.Parent = Root
 
+            Humanoid.PlatformStand = false
+
             FlyConnection = RunService.RenderStepped:Connect(function()
-                local Camera = workspace.CurrentCamera
-                BodyGyro.CFrame = Camera.CFrame
 
-                local Move = Vector3.zero
+                if not flyEnabled then
+                    return
+                end
 
-                if UIS:IsKeyDown(Enum.KeyCode.W) then Move += Camera.CFrame.LookVector end
-                if UIS:IsKeyDown(Enum.KeyCode.S) then Move -= Camera.CFrame.LookVector end
-                if UIS:IsKeyDown(Enum.KeyCode.A) then Move -= Camera.CFrame.RightVector end
-                if UIS:IsKeyDown(Enum.KeyCode.D) then Move += Camera.CFrame.RightVector end
+                Character = Player.Character
+                if not Character then return end
 
-                BodyVelocity.Velocity = Move.Magnitude > 0 and Move.Unit * 60 or Vector3.zero
+                Humanoid = Character:FindFirstChild("Humanoid")
+                Root = Character:FindFirstChild("HumanoidRootPart")
+
+                if not Humanoid or not Root then
+                    return
+                end
+
+                BodyGyro.CFrame = workspace.CurrentCamera.CFrame
+
+                local Move = Humanoid.MoveDirection
+
+                if Move.Magnitude > 0 then
+                    BodyVelocity.Velocity = Move * flySpeed
+                else
+                    BodyVelocity.Velocity = Vector3.zero
+                end
             end)
+
         else
+
             if FlyConnection then
                 FlyConnection:Disconnect()
                 FlyConnection = nil
@@ -449,9 +501,28 @@ local Toggle = PLTab:CreateToggle({
                 BodyGyro:Destroy()
                 BodyGyro = nil
             end
+
         end
     end,
 })
+
+Player.CharacterAdded:Connect(function()
+    if flyEnabled then
+        task.wait(0.5)
+
+        local Character = Player.Character
+        local Root = Character:WaitForChild("HumanoidRootPart")
+
+        BodyVelocity = Instance.new("BodyVelocity")
+        BodyVelocity.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+        BodyVelocity.Parent = Root
+
+        BodyGyro = Instance.new("BodyGyro")
+        BodyGyro.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
+        BodyGyro.P = 10000
+        BodyGyro.Parent = Root
+    end
+end)
 
 local Section = PLTab:CreateSection("Animations")
 
