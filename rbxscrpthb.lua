@@ -376,6 +376,7 @@ PLTab:CreateToggle({
 
             humanoid.WalkSpeed = 0
             humanoid.JumpPower = 0
+            humanoid.UseJumpPower = true
             root.Anchored = true
 
             frozen = true
@@ -384,6 +385,7 @@ PLTab:CreateToggle({
 
             humanoid.WalkSpeed = oldWalkSpeed
             humanoid.JumpPower = oldJumpPower
+            humanoid.UseJumpPower = true
 
             frozen = false
         end
