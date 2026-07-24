@@ -28,7 +28,7 @@ local Window = Rayfield:CreateWindow({
       RememberJoins = true -- Set this to false to make them join the Discord every time they load it up
    },
 
-   KeySystem = true, -- Set this to true to use our key system
+   KeySystem = false, -- Set this to true to use our key system
    KeySettings = {
       Title = "Key for Universal Hub",
       Subtitle = "Key System",
@@ -71,18 +71,19 @@ local VLTab = Window:CreateTab("Visual", "eye")
 local Section = VLTab:CreateSection("Visual") 
 
 local Toggle = VLTab:CreateToggle({
-   Name = "Enable FOV",
+   Name = "Enable Aimlock",
    CurrentValue = false,
    Flag = "Toggle1", -- A flag is the identifier for the configuration file; make sure every element has a different flag if you're using configuration saving to ensure no overlaps
    Callback = function(Value)
       getgenv().dhlock.showfov = Value
+      getgenv().dhlock.enabled = Value
    end,
 })
 
 
 local Slider = VLTab:CreateSlider({
    Name = "FOV",
-   Range = {0, 100},
+   Range = {0, 250},
    Increment = 10,
    Suffix = "POV",
    CurrentValue = 18,
