@@ -391,7 +391,7 @@ PLTab:CreateToggle({
         end
     end,
 })
-
+warn("Before Fly")
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
@@ -523,7 +523,7 @@ Player.CharacterAdded:Connect(function()
         BodyGyro.Parent = Root
     end
 end)
-
+warn("After Fly")
 local Section = PLTab:CreateSection("Animations")
 
 local animationId = ""
