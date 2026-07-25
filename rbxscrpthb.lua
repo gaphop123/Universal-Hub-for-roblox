@@ -47,7 +47,7 @@ local Loader = loadstring(game:HttpGet("https://raw.githubusercontent.com/Stratx
 
 local ULTab = Window:CreateTab("Universal Hub", "scroll-text")
 
-local Section = ULTab:CreateSection("Hubs")
+local Section = ULTab:CreateSection("Universal")
 
 local Button = ULTab:CreateButton({
     Name = "Launch Infinite Yield",
@@ -71,6 +71,14 @@ local Button = ULTab:CreateButton({
     end,
 })
 
+local Section = ULTab:CreateSection("Game")
+
+local Button = ULTab:CreateButton({
+    Name = "Launch PONG",
+    Callback = function()
+      loadstring(game:HttpGet("https://raw.githubusercontent.com/gaphop123/Pong-script/refs/heads/main/main.lua"))()
+    end,
+})
 
 local VLTab = Window:CreateTab("Visual", "eye")
 
