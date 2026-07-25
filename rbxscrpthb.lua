@@ -732,10 +732,10 @@ PLTab:CreateToggle({
     end,
 })
 
-
+local Section = PLTab:CreateSection("self destruct")
 
 PLTab:CreateButton({
-    Name = "💥 Explosion",
+    Name = "Explosion",
     Callback = function()
         local Players = game:GetService("Players")
         local Debris = game:GetService("Debris")
@@ -768,6 +768,143 @@ PLTab:CreateButton({
         Debris:AddItem(Sound, 10)
     end,
 })
+
+PLTab:CreateButton({
+    Name = "Lightning",
+    Callback = function()
+
+        local Players = game:GetService("Players")
+        local TweenService = game:GetService("TweenService")
+        local Debris = game:GetService("Debris")
+
+        local Character = Players.LocalPlayer.Character
+        if not Character then return end
+
+        local HRP = Character:FindFirstChild("HumanoidRootPart")
+        if not HRP then return end
+
+        --------------------------------------------------
+        -- FLASH
+        --------------------------------------------------
+
+        local Flash = Instance.new("PointLight")
+        Flash.Color = Color3.new(1,1,1)
+        Flash.Range = 60
+        Flash.Brightness = 0
+        Flash.Parent = HRP
+
+        TweenService:Create(
+            Flash,
+            TweenInfo.new(0.05),
+            {Brightness = 25}
+        ):Play()
+
+        task.delay(0.08,function()
+            TweenService:Create(
+                Flash,
+                TweenInfo.new(0.3),
+                {Brightness = 0}
+            ):Play()
+        end)
+
+        Debris:AddItem(Flash,1)
+
+        --------------------------------------------------
+        -- SPARKS
+        --------------------------------------------------
+
+        local Spark = Instance.new("ParticleEmitter")
+        Spark.Texture = "rbxasset://textures/particles/sparkles_main.dds"
+        Spark.Speed = NumberRange.new(30,60)
+        Spark.Lifetime = NumberRange.new(.2,.5)
+        Spark.Rate = 0
+        Spark.SpreadAngle = Vector2.new(360,360)
+        Spark.Parent = HRP
+        Spark:Emit(300)
+        local Humanoid = Character:FindFirstChildWhichIsA("Humanoid")
+        if Humanoid then
+            Humanoid.Health = 0
+        end
+
+        Debris:AddItem(Spark,2)
+
+        --------------------------------------------------
+        -- LIGHTNING BEAMS
+        --------------------------------------------------
+
+        for i = 1,6 do
+
+            local Top = Instance.new("Attachment")
+            Top.Position = Vector3.new(
+                math.random(-8,8),
+                math.random(20,35),
+                math.random(-8,8)
+            )
+            Top.Parent = HRP
+
+            local Bottom = Instance.new("Attachment")
+            Bottom.Parent = HRP
+
+            local Beam = Instance.new("Beam")
+            Beam.Attachment0 = Top
+            Beam.Attachment1 = Bottom
+            Beam.Width0 = math.random(2,4)/2
+            Beam.Width1 = 0
+            Beam.LightEmission = 1
+            Beam.LightInfluence = 0
+            Beam.FaceCamera = true
+            Beam.Color = ColorSequence.new(Color3.fromRGB(170,220,255))
+            Beam.Transparency = NumberSequence.new({
+                NumberSequenceKeypoint.new(0,0),
+                NumberSequenceKeypoint.new(1,1)
+            })
+
+            Beam.Parent = HRP
+
+            Debris:AddItem(Beam,0.15)
+            Debris:AddItem(Top,0.15)
+            Debris:AddItem(Bottom,0.15)
+        end
+
+        --------------------------------------------------
+        -- SOUND
+        --------------------------------------------------
+
+        local Sound = Instance.new("Sound")
+        Sound.SoundId = "rbxassetid://139968319088532"
+        Sound.Volume = 4
+        Sound.RollOffMaxDistance = 150
+        Sound.Parent = HRP
+        Sound:Play()
+
+        Debris:AddItem(Sound,5)
+
+        --------------------------------------------------
+        -- CAMERA SHAKE
+        --------------------------------------------------
+
+        local Camera = workspace.CurrentCamera
+        local Original = Camera.CFrame
+
+        task.spawn(function()
+            for i = 1,15 do
+                Camera.CFrame =
+                    Original *
+                    CFrame.new(
+                        math.random(-20,20)/100,
+                        math.random(-20,20)/100,
+                        math.random(-20,20)/100
+                    )
+
+                task.wait(0.02)
+            end
+
+            Camera.CFrame = Original
+        end)
+
+    end,
+})
+
 
 
 local Section = PLTab:CreateSection("Animations")
