@@ -28,7 +28,7 @@ local Window = Rayfield:CreateWindow({
       RememberJoins = true -- Set this to false to make them join the Discord every time they load it up
    },
 
-   KeySystem = false, -- Set this to true to use our key system
+   KeySystem = true, -- Set this to true to use our key system
    KeySettings = {
       Title = "Key for Universal Hub",
       Subtitle = "Key System",
@@ -45,9 +45,11 @@ local Loader = loadstring(game:HttpGet("https://raw.githubusercontent.com/Stratx
 local Loader = loadstring(game:HttpGet("https://raw.githubusercontent.com/Stratxgy/Lua-TargetHud/refs/heads/main/targethud.lua"))()
 local Loader = loadstring(game:HttpGet("https://raw.githubusercontent.com/Stratxgy/Lua-Speed/refs/heads/main/speed.lua"))()
 
+
+
 local ULTab = Window:CreateTab("Universal Hub", "scroll-text")
 
-local Section = ULTab:CreateSection("Universal")
+local Section = ULTab:CreateSection("Hubs")
 
 local Button = ULTab:CreateButton({
     Name = "Launch Infinite Yield",
@@ -56,12 +58,6 @@ local Button = ULTab:CreateButton({
     end,
 })
 
-local Button = ULTab:CreateButton({
-    Name = "Wall Hop Script",
-    Callback = function()
-      loadstring(game:HttpGet("https://raw.githubusercontent.com/ScpGuest666/Random-Roblox-script/refs/heads/main/Roblox%20WallHop%20V4%20script"))()
-    end,
-})
 
 
 local Button = ULTab:CreateButton({
@@ -71,20 +67,11 @@ local Button = ULTab:CreateButton({
     end,
 })
 
-local Section = ULTab:CreateSection("Game")
 
-local Button = ULTab:CreateButton({
-    Name = "Launch PONG",
-    Callback = function()
-      loadstring(game:HttpGet("https://raw.githubusercontent.com/gaphop123/Pong-script/refs/heads/main/main.lua"))()
-    end,
-})
+local CTTab = Window:CreateTab("Combat", "swords")
 
-local VLTab = Window:CreateTab("Visual", "eye")
 
-local Section = VLTab:CreateSection("Visual") 
-
-local Toggle = VLTab:CreateToggle({
+local Toggle = CTTab:CreateToggle({
    Name = "Enable Aimlock",
    CurrentValue = false,
    Flag = "Toggle1", -- A flag is the identifier for the configuration file; make sure every element has a different flag if you're using configuration saving to ensure no overlaps
@@ -94,8 +81,7 @@ local Toggle = VLTab:CreateToggle({
    end,
 })
 
-
-local Slider = VLTab:CreateSlider({
+local Slider = CTTab:CreateSlider({
    Name = "FOV",
    Range = {0, 250},
    Increment = 10,
@@ -106,6 +92,12 @@ local Slider = VLTab:CreateSlider({
       getgenv().dhlock.fov = Value
    end,
 })
+
+
+local VLTab = Window:CreateTab("Visual", "eye")
+
+local Section = VLTab:CreateSection("Visual") 
+
 
 local Toggle = VLTab:CreateToggle({
    Name = "ESP",
