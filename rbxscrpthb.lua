@@ -732,6 +732,38 @@ PLTab:CreateToggle({
     end,
 })
 
+PLTab:CreateButton({
+    Name = "💥 Explosion",
+    Callback = function()
+        local Players = game:GetService("Players")
+        local Debris = game:GetService("Debris")
+
+        local Character = Players.LocalPlayer.Character
+        if not Character then return end
+
+        local HRP = Character:FindFirstChild("HumanoidRootPart")
+        if not HRP then return end
+
+        -- Explosion
+        local Explosion = Instance.new("Explosion")
+        Explosion.Position = HRP.Position
+        Explosion.BlastRadius = 15
+        Explosion.BlastPressure = 500000
+        Explosion.DestroyJointRadiusPercent = 0
+        Explosion.Parent = workspace
+
+        -- Sound
+        local Sound = Instance.new("Sound")
+        Sound.SoundId = "rbxassetid://140278004623742"
+        Sound.Volume = 3
+        Sound.RollOffMaxDistance = 100
+        Sound.Parent = HRP
+        Sound:Play()
+
+        Debris:AddItem(Sound, 10)
+    end,
+})
+
 
 local Section = PLTab:CreateSection("Animations")
 
