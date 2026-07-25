@@ -94,6 +94,8 @@ local Slider = CTTab:CreateSlider({
 })
 
 
+
+
 local VLTab = Window:CreateTab("Visual", "eye")
 
 local Section = VLTab:CreateSection("Visual") 
@@ -582,9 +584,153 @@ end)
 
 
 
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+local SelectedPlayer = nil
+
+-- Hàm lấy danh sách người chơi
+local function GetPlayerNames()
+    local Names = {}
+
+    for _, Player in ipairs(Players:GetPlayers()) do
+        if Player ~= LocalPlayer then
+            table.insert(Names, Player.Name)
+        end
+    end
+
+    return Names
+end
+
+-- Dropdown
+local PlayerDropdown = PLTab:CreateDropdown({
+    Name = "Select Player",
+    Options = GetPlayerNames(),
+    CurrentOption = {},
+    MultipleOptions = false,
+    Flag = "PlayerDropdown",
+    Callback = function(Options)
+        SelectedPlayer = Options[1]
+    end,
+})
+
+-- Tự cập nhật khi có người vào/rời
+local function RefreshPlayers()
+    PlayerDropdown:Refresh(GetPlayerNames())
+end
+
+Players.PlayerAdded:Connect(RefreshPlayers)
+Players.PlayerRemoving:Connect(RefreshPlayers)
+
+-- Nút Teleport
+PLTab:CreateButton({
+    Name = "Teleport",
+    Callback = function()
+        if not SelectedPlayer then
+            warn("Player not selected.")
+            return
+        end
+
+        local Target = Players:FindFirstChild(SelectedPlayer)
+
+        if Target
+        and Target.Character
+        and Target.Character:FindFirstChild("HumanoidRootPart")
+        and LocalPlayer.Character
+        and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+
+            LocalPlayer.Character.HumanoidRootPart.CFrame =
+                Target.Character.HumanoidRootPart.CFrame + Vector3.new(0,3,0)
+        end
+    end,
+})
 
 
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
 
+local LocalPlayer = Players.LocalPlayer
+
+local SelectedPlayer
+local FollowEnabled = false
+local FollowConnection
+
+-- Lấy danh sách người chơi
+local function GetPlayers()
+    local List = {}
+
+    for _,v in ipairs(Players:GetPlayers()) do
+        if v ~= LocalPlayer then
+            table.insert(List, v.Name)
+        end
+    end
+
+    return List
+end
+
+-- Dropdown
+local PlayerDropdown = PLTab:CreateDropdown({
+    Name = "Player",
+    Options = GetPlayers(),
+    CurrentOption = {},
+    MultipleOptions = false,
+    Flag = "FollowPlayer",
+    Callback = function(Options)
+        SelectedPlayer = Options[1]
+    end,
+})
+
+local function RefreshPlayers()
+    PlayerDropdown:Refresh(GetPlayers())
+end
+
+Players.PlayerAdded:Connect(RefreshPlayers)
+Players.PlayerRemoving:Connect(RefreshPlayers)
+
+-- Toggle Follow
+PLTab:CreateToggle({
+    Name = "Follow Player",
+    CurrentValue = false,
+    Flag = "FollowToggle",
+    Callback = function(Value)
+        FollowEnabled = Value
+
+        if FollowConnection then
+            FollowConnection:Disconnect()
+            FollowConnection = nil
+        end
+
+        if not FollowEnabled then
+            return
+        end
+
+        FollowConnection = RunService.Heartbeat:Connect(function()
+            if not SelectedPlayer then
+                return
+            end
+
+            local Target = Players:FindFirstChild(SelectedPlayer)
+            if not Target then
+                return
+            end
+
+            local MyChar = LocalPlayer.Character
+            local TargetChar = Target.Character
+
+            if not (MyChar and TargetChar) then
+                return
+            end
+
+            local Humanoid = MyChar:FindFirstChildOfClass("Humanoid")
+            local TargetHRP = TargetChar:FindFirstChild("HumanoidRootPart")
+
+            if Humanoid and TargetHRP then
+                -- Đi bộ đến vị trí của người chơi
+                Humanoid:MoveTo(TargetHRP.Position)
+            end
+        end)
+    end,
+})
 
 
 local Section = PLTab:CreateSection("Animations")
