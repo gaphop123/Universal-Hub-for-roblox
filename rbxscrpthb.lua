@@ -49,7 +49,7 @@ local Loader = loadstring(game:HttpGet("https://raw.githubusercontent.com/Stratx
 
 local ULTab = Window:CreateTab("Universal Hub", "scroll-text")
 
-local Section = ULTab:CreateSection("Hubs")
+local Section = ULTab:CreateSection("Universal")
 
 local Button = ULTab:CreateButton({
     Name = "Launch Infinite Yield",
@@ -66,6 +66,16 @@ local Button = ULTab:CreateButton({
       loadstring(game:HttpGet("https://raw.githubusercontent.com/Joystickplays/psychic-octo-invention/main/source/yarhm/1.21/yarhm.lua"))()
     end,
 })
+
+local Section = ULTab:CreateSection("Game")
+
+local Button = ULTab:CreateButton({
+    Name = "Launch Pong",
+    Callback = function()
+      loadstring(game:HttpGet("https://raw.githubusercontent.com/gaphop123/Pong-script/refs/heads/main/main.lua"))()
+    end,
+})
+
 
 
 local CTTab = Window:CreateTab("Combat", "swords")
