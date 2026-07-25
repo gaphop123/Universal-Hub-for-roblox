@@ -732,6 +732,8 @@ PLTab:CreateToggle({
     end,
 })
 
+
+
 PLTab:CreateButton({
     Name = "💥 Explosion",
     Callback = function()
@@ -751,7 +753,10 @@ PLTab:CreateButton({
         Explosion.BlastPressure = 500000
         Explosion.DestroyJointRadiusPercent = 0
         Explosion.Parent = workspace
-
+        local Humanoid = Character:FindFirstChildWhichIsA("Humanoid")
+        if Humanoid then
+            Humanoid.Health = 0
+        end
         -- Sound
         local Sound = Instance.new("Sound")
         Sound.SoundId = "rbxassetid://140278004623742"
