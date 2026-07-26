@@ -66,6 +66,14 @@ local Button = ULTab:CreateButton({
 })
 
 local Button = ULTab:CreateButton({
+    Name = "Super Ring V4",
+    Callback = function()
+      loadstring(game:HttpGet("https://rawscripts.net/raw/Natural-Disaster-Survival-Super-ring-V4-24296"))()
+    end,
+})
+
+
+local Button = ULTab:CreateButton({
     Name = "Launch YARHM",
     Callback = function()
       loadstring(game:HttpGet("https://raw.githubusercontent.com/Joystickplays/psychic-octo-invention/main/source/yarhm/1.21/yarhm.lua"))()
