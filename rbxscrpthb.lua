@@ -68,7 +68,7 @@ local Button = ULTab:CreateButton({
 local Button = ULTab:CreateButton({
     Name = "Super Ring V4",
     Callback = function()
-      loadstring(game:HttpGet("https://rawscripts.net/raw/Natural-Disaster-Survival-Super-ring-V4-24296"))()
+      loadstring(game:HttpGet("https://raw.githubusercontent.com/gaphop123/Super-Ring-V4/refs/heads/main/main.lua"))()
     end,
 })
 
