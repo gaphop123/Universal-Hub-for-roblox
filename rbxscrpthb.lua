@@ -58,7 +58,12 @@ local Button = ULTab:CreateButton({
     end,
 })
 
-
+local Button = ULTab:CreateButton({
+    Name = "Launch Remote spy",
+    Callback = function()
+      loadstring(game:HttpGet("https://github.com/notpoiu/cobalt/releases/latest/download/Cobalt.luau"))()
+    end,
+})
 
 local Button = ULTab:CreateButton({
     Name = "Launch YARHM",
