@@ -59,9 +59,23 @@ local Button = ULTab:CreateButton({
 })
 
 local Button = ULTab:CreateButton({
-    Name = "Launch Remote spy",
+    Name = "AFEM Max - The best AI-powered emote script!",
+    Callback = function()
+      loadstring(game:HttpGet("https://yarhm.mhi.im/scr?channel=afemmax"))()
+    end,
+})
+
+local Button = ULTab:CreateButton({
+    Name = "Launch Remote Spy",
     Callback = function()
       loadstring(game:HttpGet("https://github.com/notpoiu/cobalt/releases/latest/download/Cobalt.luau"))()
+    end,
+})
+
+local Button = ULTab:CreateButton({
+    Name = "Launch Simple Spy",
+    Callback = function()
+      loadstring(game:HttpGet("https://github.com/exxtremestuffs/SimpleSpySource/raw/master/SimpleSpy.lua"))()
     end,
 })
 
@@ -933,26 +947,55 @@ PLTab:CreateButton({
 local Section = PLTab:CreateSection("Animations")
 
 local animationId = ""
+local currentTrack
+local looped = false
+local speed = 1
 
-local Input = PLTab:CreateInput({
+PLTab:CreateInput({
     Name = "Animation ID",
     CurrentValue = "",
     PlaceholderText = "Ex: 507766388",
     RemoveTextAfterFocusLost = false,
-    Flag = "AnimationID",
-    Callback = function(Text)
-        animationId = Text
-    end,
+    Callback = function(text)
+        animationId = text
+    end
 })
 
-local Button = PLTab:CreateButton({
+PLTab:CreateInput({
+    Name = "Speed",
+    CurrentValue = "1",
+    PlaceholderText = "1 = Normal",
+    RemoveTextAfterFocusLost = false,
+    Callback = function(text)
+        speed = tonumber(text) or 1
+    end
+})
+
+PLTab:CreateToggle({
+    Name = "Loop",
+    CurrentValue = false,
+    Callback = function(value)
+        looped = value
+        if currentTrack then
+            currentTrack.Looped = value
+        end
+    end
+})
+
+PLTab:CreateButton({
     Name = "Play Animation",
     Callback = function()
+
+        if animationId == "" then
+            warn("No Animation ID")
+            return
+        end
+
         local player = game.Players.LocalPlayer
         local character = player.Character or player.CharacterAdded:Wait()
         local humanoid = character:FindFirstChildOfClass("Humanoid")
 
-        if not humanoid or animationId == "" then
+        if not humanoid then
             return
         end
 
@@ -962,19 +1005,42 @@ local Button = PLTab:CreateButton({
             animator.Parent = humanoid
         end
 
-        local animation = Instance.new("Animation")
-        animation.AnimationId = "rbxassetid://" .. animationId
+        if currentTrack then
+            currentTrack:Stop()
+            currentTrack:Destroy()
+        end
+
+        local anim = Instance.new("Animation")
+        anim.AnimationId = "rbxassetid://" .. animationId
 
         local success, track = pcall(function()
-            return animator:LoadAnimation(animation)
+            return animator:LoadAnimation(anim)
         end)
 
         if success and track then
-            track:Play()
+            currentTrack = track
+            track.Priority = Enum.AnimationPriority.Action
+            track.Looped = looped
+            track:Play(0.15)
+            track:AdjustSpeed(speed)
         else
-            warn("invalid animation.")
+            warn("Failed to load animation.")
         end
-    end,
+
+    end
+})
+
+PLTab:CreateButton({
+    Name = "Stop Animation",
+    Callback = function()
+
+        if currentTrack then
+            currentTrack:Stop()
+            currentTrack:Destroy()
+            currentTrack = nil
+        end
+
+    end
 })
 
 local RunService = game:GetService("RunService")
